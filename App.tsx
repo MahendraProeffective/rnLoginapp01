@@ -39,10 +39,12 @@ const App = () => {
 		mobileNumber: ''
 	});
 	const [ otpState, setotpState ] = useState({
-		OTP: ''
+		OTP: 1234
 	});
+	const [ userId,setUserId] = useState(1);
 	const [message ,setMessage] = useState({mess:" "});
-	const handleSubmit = async (phoneNumber: any) => {
+	const [otpMessage ,setOtpMessage] = useState({mess:" "});
+	const otpSender = async (phoneNumber: any) => {
 		// e.preventDefault();
 		try {
 			const response = await fetch('http://10.0.2.2:8080/api/getOTP', {
@@ -57,31 +59,63 @@ const App = () => {
 			})
 		});
 		const result = await response.json();
-		console.log(typeof result.messages[0]);
+		console.log(result);
 		setMessage({mess:result.messages[0]});
+		setUserId(result.userId);
 		console.log(message.mess);
 		} catch (error) {
 			console.log(error+"========")
 		}
 	};
-	const onPressForgotOTP = () => {
-		// Do something about forgot OTP operation
+
+	const otpChecker = async (otp: any) => {
+		console.log(userId)
+		// e.preventDefault();
+		try {
+			const response = await fetch(`http://10.0.2.2:8080/api/validateOTP/${userId}`, {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				"phoneNumber":MobileNumberState.mobileNumber,
+				"otp": otpState.OTP
+			})
+		});
+		const result = await response.json();
+		console.log(result.messages[0]);
+		setOtpMessage({mess:result.messages[0]});
+		console.log(message.mess+"----------------------------");
+		} catch (error) {
+			console.log(error+"========")
+		}
 	};
-	const onPressSignUp = () => {
-		// Do something about signup operation
-	};
-	function onPressLogin(event: GestureResponderEvent): void {
-		throw new Error('Function not implemented.');
+	function onPressLogin(otp: any) {
+		console.log(otpState)
+		otpChecker(otpState);
+		return(<LoginSuccess/>)
 	}
 
 	function onPressSendOtp() {
-		handleSubmit(MobileNumberState);
-		return(<OtpSuccess></OtpSuccess>)
+		otpSender(MobileNumberState);
+		return(<OtpSuccess/>)
 	}
 	const OtpSuccess = () =>{
 		if(message){
 			return(<Text>
 				{message.mess}
+			</Text>)
+		}
+		return(<Text>
+			failure----------
+		</Text>)
+
+	}
+	const LoginSuccess = () =>{
+		if(message){
+			return(<Text>
+				{otpMessage.mess}
 			</Text>)
 		}
 		return(<Text>
@@ -108,7 +142,7 @@ const App = () => {
 			<View style={styles.inputView}>
 				<TextInput
 					style={styles.inputText}
-					onChangeText={(text) => setotpState({ OTP: text })}
+					onChangeText={(text: any) => setotpState({ OTP: text })}
 					secureTextEntry
 					placeholder="Enter OTP here"
 					placeholderTextColor="#003f5c"
@@ -117,7 +151,9 @@ const App = () => {
 			<TouchableOpacity style={styles.loginBtn} onPress={onPressLogin}>
 				<Text style={styles.loginText}>LOGIN </Text>
 			</TouchableOpacity>
+			<LoginSuccess/>
 		</View>
+
 	);
 };
 
