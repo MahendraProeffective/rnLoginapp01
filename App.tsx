@@ -25,7 +25,7 @@ const loginSuccess = () => {
 		</view>
 	);
 };
-const loginFalure = () => {
+const loginFailure = () => {
 	return (
 		<view>
 			<Text>Invalid credentials</Text>
@@ -41,6 +41,7 @@ const App = () => {
 	const [ otpState, setotpState ] = useState({
 		OTP: ''
 	});
+	const [message ,setMessage] = useState({mess:" "});
 	const handleSubmit = async (phoneNumber: any) => {
 		// e.preventDefault();
 		try {
@@ -56,36 +57,37 @@ const App = () => {
 			})
 		});
 		const result = await response.json();
-		console.log(result.messages[0]);
+		console.log(typeof result.messages[0]);
+		setMessage({mess:result.messages[0]});
+		console.log(message.mess);
 		} catch (error) {
 			console.log(error+"========")
 		}
 	};
-	// const onPressLogin = () => {
-	// 	// Do something about login operation
-	// return (
-	// 	<view style={styles.container}>
-	// 		<Text>You Logged in successfully</Text>
-	// 	</view>
-	// );
-	// };
 	const onPressForgotOTP = () => {
 		// Do something about forgot OTP operation
 	};
 	const onPressSignUp = () => {
 		// Do something about signup operation
 	};
-	// function onPressSendOtp(event: GestureResponderEvent): void {
-
-		// handleSubmit();
-	// }
-
 	function onPressLogin(event: GestureResponderEvent): void {
 		throw new Error('Function not implemented.');
 	}
 
 	function onPressSendOtp() {
 		handleSubmit(MobileNumberState);
+		return(<OtpSuccess></OtpSuccess>)
+	}
+	const OtpSuccess = () =>{
+		if(message){
+			return(<Text>
+				{message.mess}
+			</Text>)
+		}
+		return(<Text>
+			failure----------
+		</Text>)
+
 	}
 
 	return (
@@ -102,6 +104,7 @@ const App = () => {
 			<TouchableOpacity style={styles.loginBtn} onPress={onPressSendOtp}>
 				<Text style={styles.loginText}>Send OTP </Text>
 			</TouchableOpacity>
+			<OtpSuccess/>
 			<View style={styles.inputView}>
 				<TextInput
 					style={styles.inputText}
@@ -111,17 +114,9 @@ const App = () => {
 					placeholderTextColor="#003f5c"
 				/>
 			</View>
-
-			{/* <TouchableOpacity onPress={onPressForgotOTP}>
-				<Text style={styles.forgotAndSignUpText}>Forgot OTP?</Text>
-			</TouchableOpacity> */}
-
 			<TouchableOpacity style={styles.loginBtn} onPress={onPressLogin}>
 				<Text style={styles.loginText}>LOGIN </Text>
 			</TouchableOpacity>
-			{/* <TouchableOpacity onPress={onPressSignUp}>
-				<Text style={styles.inputText}>Signup</Text>
-			</TouchableOpacity> */}
 		</View>
 	);
 };
