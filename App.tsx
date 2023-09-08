@@ -7,6 +7,7 @@
  */
 
 import React, { useState } from 'react';
+import ec2Host from './Environments/dev';
 import {
 	Alert,
 	Button,
@@ -39,15 +40,17 @@ const App = () => {
 		mobileNumber: ''
 	});
 	const [ otpState, setotpState ] = useState({
-		OTP: 1234
+		OTP: 0
 	});
 	const [ userId,setUserId] = useState(1);
 	const [message ,setMessage] = useState({mess:" "});
 	const [otpMessage ,setOtpMessage] = useState({mess:" "});
 	const otpSender = async (phoneNumber: any) => {
 		// e.preventDefault();
+		// let ec2Host = ec2Host;
+		console.log(ec2Host+"=============ec2 host")
 		try {
-			const response = await fetch('http://10.0.2.2:8080/api/getOTP', {
+			const response = await fetch(`http://${ec2Host}:8080/api/getOTP`, {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
@@ -62,7 +65,7 @@ const App = () => {
 		console.log(result);
 		setMessage({mess:result.messages[0]});
 		setUserId(result.userId);
-		console.log(message.mess);
+		// console.log(message.mess);
 		} catch (error) {
 			console.log(error+"========")
 		}
@@ -72,7 +75,7 @@ const App = () => {
 		console.log(userId)
 		// e.preventDefault();
 		try {
-			const response = await fetch(`http://10.0.2.2:8080/api/validateOTP/${userId}`, {
+			const response = await fetch(`http://${ec2Host}:8080/api/validateOTP/${userId}`, {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
@@ -84,9 +87,9 @@ const App = () => {
 			})
 		});
 		const result = await response.json();
-		console.log(result.messages[0]);
+		// console.log(result.messages[0]);
 		setOtpMessage({mess:result.messages[0]});
-		console.log(message.mess+"----------------------------");
+		console.log(otpMessage.mess+"----------------------------");
 		} catch (error) {
 			console.log(error+"========")
 		}
