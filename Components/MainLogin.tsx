@@ -1,12 +1,28 @@
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ec2HostDev from "../Environments/dev";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import storedUserId from "../App";
+import SyncStorage from 'sync-storage';
+
+
 
 const MainLogin = ({navigation}: {navigation: any}) => {
+    // console.log(storedUserId)
+    const [ userId, setUserId ] = useState(1);
+    const storeData = async (value: any) => {
+        try {
+            console.log("Inside storeData--------------------------------")
+        await AsyncStorage.setItem('MFLuserId', value.toString());
+        console.log(AsyncStorage.getItem('MFLuserId'));
+        } catch (e) {
+        console.log(e);
+        }
+        };
 	const LoginButton = () => {
 		return (
 			<><TouchableOpacity disabled={otpState.OTP == 0} style={styles.loginBtn} onPress={() => {
-				console.log(otpState);
+				// console.log(otpState+"otostate");
 				setOtpMessage({ mess: ' ',status:' ' })
 				otpChecker(otpState);}} >
 				<Text style={styles.loginText}>LOGIN </Text>
@@ -30,15 +46,14 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 	const [ otpState, setotpState ] = useState({
 		OTP: 0
 	});
-	const [ userId, setUserId ] = useState(1);
-	const [ message, setMessage ] = useState({ mess: ' ' });
+
+	const [ otpSenderMessage, setOtpSenderMessage ] = useState({ mess: ' ' });
 	const [ otpMessage, setOtpMessage ] = useState({ mess: ' ',status:' ' });
 
 	const otpSender = async (phoneNumber: any) => {
-		// e.preventDefault();
-		// let ec2HostDev = ec2HostDev;
+
 		console.log(ec2HostDev + '=============ec2 host');
-        setMessage({ mess: ' ' });
+        setOtpSenderMessage({ mess: ' ' });
 		try {
 			const response = await fetch(`http://${ec2HostDev}:8080/api/getOTP`, {
 				method: 'POST',
@@ -54,26 +69,33 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 			const result = await response.json();
 			console.log(result);
 
-			setMessage({ mess: result.messages[0] });
+			setOtpSenderMessage({ mess: result.messages[0] });
+
+            storeData(result.userId);
+            SyncStorage.set('userId',result.userId);
+            console.log(typeof result.userId+ " result.userId type-----------"+ SyncStorage.get('userId'));
 			setUserId(result.userId);
-			// console.log(message.mess);
+			// console.log( await AsyncStorage.getItem('MFLuserId')+"======  MFLuserId");
+
 		} catch (error) {
 			console.log(error + '========');
 		}
 	};
 
 	const otpChecker = async (otp: any) => {
+        console.log(SyncStorage.getAllKeys())
 		console.log(userId);
 		// e.preventDefault();
 		try {
 			setOtpMessage({ mess: ' ',status:' ' });
-			const response = await fetch(`http://${ec2HostDev}:8080/api/validateOTP/${userId}`, {
+			const response = await fetch(`http://${ec2HostDev}:8080/api/validateOTP`, {
 				method: 'POST',
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
+                    userId:SyncStorage.get('userId'),
 					phoneNumber: MobileNumberState.mobileNumber,
 					otp: otpState.OTP
 				})
@@ -102,8 +124,8 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 		return <OtpSuccess />;
 	}
 	const OtpSuccess = () => {
-		if (message) {
-			return <Text>{message.mess}</Text>;
+		if (otpSenderMessage) {
+			return <Text>{otpSenderMessage.mess}</Text>;
 		}
 		return <Text>failure----------</Text>;
 	};
