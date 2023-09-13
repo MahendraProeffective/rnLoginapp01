@@ -6,7 +6,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import MyFroyo from './Components/MyFroyo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,64 +14,94 @@ import data from './Components/StoredUserId';
 import storedUserId from './Components/StoredUserId';
 import ec2HostDev from './Environments/dev';
 import SyncStorage from 'sync-storage';
+import Home from './Components/Home';
+import localStorage from 'react-native-sync-localstorage'
 
 const App = () => {
-	console.log("HI There")
+	console.log('HI There in App');
+	// SyncStorage.init();
+	const [uid,setuid]: any = useState();
+	const getKey =async () => {
+		const userId = await AsyncStorage.getItem('MFLuserId');
+		setuid(userId);
+		console.log(uid+"-----userId-----------");
+	}
+	getKey();
 
-	const  getStoredData = async () =>{
-		let data: any;
-        try{
-        const getAsyncStorageData = await AsyncStorage.getItem('MFLuserId').then(val => {
-            data = JSON.parse(val!);
-			console.log(data)
-        } );
-		await fetch(`http://${ec2HostDev}:8080/api/getOTP`, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				userId:data,
-			})
-		}).then(result => result.text()).then(text => {
-			const data = JSON.parse(text);
-			console.log(data.status+"     textJson")});
+	console.log(uid+"sssssssssssssss"+SyncStorage.getAllKeys())
+	if(uid > 0){
+		return (
+			<NavigationContainer>
+				<Home />
+			</NavigationContainer>
+		);
+	}
+	else{
+		return (
+			<NavigationContainer>
+				<MyFroyo />
+			</NavigationContainer>
+		);
+	}
 
-        return getAsyncStorageData;
-        } catch (e){
-            console.log(e);
-        }
+	// fetch(`http://${ec2HostDev}:8080/api/getOTP`, {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				Accept: 'application/json',
+	// 				'Content-Type': 'application/json'
+	// 			},
+	// 			body: JSON.stringify({
+	// 				userId: data
+	// 			})
+	// 		})
+	// 			.then((result) => result.text())
+	// 			.then((text) => {
+	// 				const data = JSON.parse(text);
+	// 				console.log(data.status + '     textJson');
+	// 			});
 
-    }
-	const AutoLogin = async () => {
-		console.log(ec2HostDev + '=============AutoLogin() with uid'+SyncStorage.get('userId'));
-		try {
-			console.log(data+"!!!!!!")
-			const response = await fetch(`http://${ec2HostDev}:8080/api/getOTP`, {
-				method: 'POST',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					userId:data,
-					otp: ''
-				})
-			});
-			const result = await response.json();
-			console.log(result);
-		} catch (error) {
-			console.log(error + '========');
-		}
-	};
-	// AutoLogin();
-	getStoredData();
-	return (
-		<NavigationContainer>
-			<MyFroyo />
-		</NavigationContainer>
-	);
+	// const getStoredData = async () => {
+
+	// 	let data: any= SyncStorage.get('MFLuserId');
+	// 	try {
+	// 		const getAsyncStorageData = await AsyncStorage.getItem('MFLuserId').then((val) => {
+	// 			// data = JSON.parse(val!);
+	// 			console.log(data);
+	// 		});
+	// 		await fetch(`http://${ec2HostDev}:8080/api/getOTP`, {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				Accept: 'application/json',
+	// 				'Content-Type': 'application/json'
+	// 			},
+	// 			body: JSON.stringify({
+	// 				userId: data
+	// 			})
+	// 		})
+	// 			.then((result) => result.text())
+	// 			.then((text) => {
+	// 				const data = JSON.parse(text);
+	// 				console.log(data.status + '     textJson');
+	// 			});
+
+	// 		console.log(data);
+	// 		return data;
+	// 	} catch (e) {
+	// 		console.log(e);
+	// 	}
+	// };
+	// const flag = () =>{
+	// 	let r;
+	// 	getStoredData().then((res) => {
+	// 		r=res;
+	// 		console.log(res + '---res');
+	// 		return res;
+	// 	});
+	// 	return r
+	// }
+	// console.log(flag())
+
+
 };
 // function App(): JSX.Element {
 //   const isDarkMode = useColorScheme() === 'dark';
@@ -115,4 +145,3 @@ const App = () => {
 // }
 
 export default App;
-

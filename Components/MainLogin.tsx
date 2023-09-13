@@ -4,6 +4,8 @@ import ec2HostDev from "../Environments/dev";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import storedUserId from "../App";
 import SyncStorage from 'sync-storage';
+import localStorage from 'react-native-sync-localstorage'
+
 
 
 
@@ -62,6 +64,7 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
+                    userId:SyncStorage.get('MFLuserId'),
 					phoneNumber: MobileNumberState.mobileNumber,
 					otp: ''
 				})
@@ -72,8 +75,13 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 			setOtpSenderMessage({ mess: result.messages[0] });
 
             storeData(result.userId);
-            SyncStorage.set('userId',result.userId);
-            console.log(typeof result.userId+ " result.userId type-----------"+ SyncStorage.get('userId'));
+            SyncStorage.set('MFLuserId',result.userId);
+            try {
+                localStorage.setItem('key', result.userId);
+            } catch (error) {
+                console.info(error)
+            }
+            console.log(typeof result.userId+ " result.userId type-----------"+ SyncStorage.get('MFLuserId')+"-----------"+localStorage.getItem('key'));
 			setUserId(result.userId);
 			// console.log( await AsyncStorage.getItem('MFLuserId')+"======  MFLuserId");
 
@@ -84,7 +92,7 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 
 	const otpChecker = async (otp: any) => {
         console.log(SyncStorage.getAllKeys())
-		console.log(userId);
+		console.log(SyncStorage.get('MFLuserId')+"------SyncStorage.get('MFLuserId')");
 		// e.preventDefault();
 		try {
 			setOtpMessage({ mess: ' ',status:' ' });
@@ -95,7 +103,7 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-                    userId:SyncStorage.get('userId'),
+                    userId:SyncStorage.get('MFLuserId'),
 					phoneNumber: MobileNumberState.mobileNumber,
 					otp: otpState.OTP
 				})
