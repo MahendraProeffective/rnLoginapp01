@@ -2,16 +2,12 @@ import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ec2HostDev from "../Environments/dev";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import storedUserId from "../App";
 import SyncStorage from 'sync-storage';
 import localStorage from 'react-native-sync-localstorage'
 
-
-
-
 const MainLogin = ({navigation}: {navigation: any}) => {
     // console.log(storedUserId)
-    const [ userId, setUserId ] = useState(1);
+    // const [ userId, setUserId ] = useState(1);
     const storeData = async (value: any) => {
         try {
             console.log("Inside storeData--------------------------------")
@@ -82,7 +78,7 @@ const MainLogin = ({navigation}: {navigation: any}) => {
                 console.info(error)
             }
             console.log(typeof result.userId+ " result.userId type-----------"+ SyncStorage.get('MFLuserId')+"-----------"+localStorage.getItem('key'));
-			setUserId(result.userId);
+			// setUserId(result.userId);
 			// console.log( await AsyncStorage.getItem('MFLuserId')+"======  MFLuserId");
 
 		} catch (error) {
@@ -158,18 +154,19 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 			</View>
 			<OTPSenderButton />
 			<OtpSuccess />
-			<View style={styles.inputView}>
-				<TextInput
-					style={styles.inputText}
-					keyboardType="numeric"
-					onChangeText={(text: any) => setotpState({ OTP: text })}
-					secureTextEntry
-					accessibilityElementsHidden
-					placeholder="Enter OTP here"
-					placeholderTextColor="#003f5c"
-				/>
-			</View>
-			<LoginButton />
+			{
+                (otpSenderMessage.mess.length >1)?<><View style={styles.inputView}>
+                    <TextInput
+                        style={styles.inputText}
+                        keyboardType="numeric"
+                        onChangeText={(text: any) => setotpState({ OTP: text })}
+                        secureTextEntry
+                        accessibilityElementsHidden
+                        placeholder="Enter OTP here"
+                        placeholderTextColor="#003f5c" />
+                </View><LoginButton /></>:null
+            }
+
 			<LoginSuccess />
 		</View>
 	);
