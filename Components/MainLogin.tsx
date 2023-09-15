@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import ec2HostDev from "../Environments/dev";
+import {ec2HostDev} from "../Environments/dev";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SyncStorage from 'sync-storage';
 import localStorage from 'react-native-sync-localstorage'
@@ -109,7 +109,7 @@ const MainLogin = ({navigation}: {navigation: any}) => {
 			setOtpMessage({ mess: result.messages[0],status:result.status });
 			console.log(otpMessage.mess + '----------------------------'+JSON.stringify(result));
 				if(result.status === 'VALID'){
-					navigation.navigate('Home')
+					navigation.navigate('Signup')
 				}
 				else{
 					console.log("else------------")

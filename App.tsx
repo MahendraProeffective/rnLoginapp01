@@ -12,6 +12,8 @@ import MyFroyo from './Components/MyFroyo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SyncStorage from 'sync-storage';
 import Home from './Components/Home';
+import Signup from './Components/Signup';
+import { NativeBaseProvider } from 'native-base';
 
 const App = () => {
 	console.log('HI There in App');
@@ -23,7 +25,6 @@ const App = () => {
 		console.log(uid+"-----userId-----------");
 	}
 	getKey();
-
 	console.log(uid+"sssssssssssssss"+SyncStorage.getAllKeys())
 	if(uid > 0){
 		return (
@@ -34,9 +35,12 @@ const App = () => {
 	}
 	else{
 		return (
-			<NavigationContainer>
+			// <NativeBaseProvider>
+				<NavigationContainer>
 				<MyFroyo />
-			</NavigationContainer>
+				</NavigationContainer>
+			// </NativeBaseProvider>
+
 		);
 	}
 };
